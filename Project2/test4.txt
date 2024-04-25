@@ -1,0 +1,24 @@
+<states>
+q0
+q1
+q2
+q3
+<input alphabet>
+a
+b
+<stack alphabet>
+0
+1
+<transitions>
+q0 a 0 q1 10
+q0 * 0 q3 *
+q1 a 1 q1 11
+q1 b 1 q2 *
+q2 b 1 q2 *
+q2 * 0 q3 *
+<initial state>
+q0
+<stack start>
+0
+<final states>
+q3

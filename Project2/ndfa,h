@@ -1,0 +1,53 @@
+#ifndef NDFA_H
+#define NDFA_H
+
+#include <vector>
+#include <tuple>
+#include <string>
+#include <map>
+
+using namespace std;
+
+class NDFA
+{
+private:
+    //data variables 
+    vector<string> states;
+    vector<char> symbols;
+    vector<char> stackSym;
+    vector<string> fStates;
+
+    char iStack;
+
+    string iState;
+
+    string curState;
+
+    map<tuple<string, char, char>, vector<pair<string, string>>> transitions;
+
+public:
+    //Constructor
+    NDFA();
+
+    //member functions
+    void addState(string state);
+    void addSymbol(char sym);
+    void addStackSymbol(char sym);
+    void addTransition(string state, char sym, char stackSym, string nextState, string sTop);
+    void addInitialState(string is);
+    void addFinalStates(string fs);
+    void addStackStart(char sym);
+
+    void displayNDFA();
+
+    void setCurAsInit();
+
+    void transition(char sym);
+
+    string getCurState();
+
+    bool validCheck(char sym);
+    bool finalCheck();
+};
+
+#endif

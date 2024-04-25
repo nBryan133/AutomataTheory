@@ -1,0 +1,29 @@
+<states>
+q0
+q1
+q2
+<input alphabet>
+a
+b
+<stack alphabet>
+a
+b
+z
+<transitions>
+q0 a a q0 aa
+q0 b a q0 ba
+q0 a b q0 ab
+q0 b b q0 bb
+q0 a z q0 az
+q0 b z q0 bz
+q0 * a q1 a
+q0 * b q1 b
+q1 a a q1 *
+q1 b b q1 *
+q1 * z q2 z
+<initial state>
+q0
+<stack start>
+z
+<final states>
+q2

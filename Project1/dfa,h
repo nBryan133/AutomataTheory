@@ -1,0 +1,46 @@
+#ifndef DFA_H
+#define DFA_H
+
+#include <vector>
+#include <string>
+#include <map>
+
+using namespace std;
+
+class DFA
+{
+private:
+    //data variables 
+    vector<string> states;
+    vector<char> symbols;
+    vector<string> fStates;
+
+    string iState;
+    string curState;
+
+    map<pair<string, char>, string> transitions;
+
+public:
+    //Constructor
+    DFA();
+
+    //member functions
+    void addState(string state);
+    void addSymbol(char sym);
+    void addTransition(string state, char symbol, string nextState);
+    void addInitialState(string is);
+    void addFinalStates(string fs);
+
+    void displayDFA();
+
+    void setCurAsInit();
+
+    void transition(char sym);
+
+    string getCurState();
+
+    bool validCheck(char sym);
+    bool finalCheck();
+};
+
+#endif
