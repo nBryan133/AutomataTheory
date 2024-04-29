@@ -24,8 +24,9 @@ private:
     string curState;
 
     map<tuple<string, char, char>, vector<pair<string, string>>> transitions;
-
+    
 public:
+
     //Constructor
     NDFA();
 

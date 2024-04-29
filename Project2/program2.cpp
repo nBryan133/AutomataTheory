@@ -19,9 +19,11 @@ int main(int argc, char *argv[])
     string step;
     string state1;
     string state2;
+    string newT;
     string uInput;
 
     char sym;
+    char stackT;
 
     bool invalid = false;
 
@@ -51,31 +53,44 @@ int main(int argc, char *argv[])
         cout << "file opened successfully.\n";
     }
 
-    DFA newDFA;
+    NDFA newNDFA;
 
     while(getline(dfaFile, nextLine))
     {
+
+        //nextLine.erase(std::remove_if(nextLine.begin(), nextLine.end(), [](unsigned char c) { return std::isspace(c); }), nextLine.end());
+        
         if(nextLine[0] == '<')
         {
+            nextLine.erase(std::remove_if(nextLine.begin(), nextLine.end(), [](unsigned char c) { return std::isspace(c); }), nextLine.end());
+        
             step = nextLine;
         }
+
+        
 
         //add states to automata
         if(step == "<states>" && nextLine[0] != '<')
         {
-            newDFA.addState(nextLine);
+            newNDFA.addState(nextLine); 
         }
 
         //add alphabet to automata
-        else if(step == "<alphabet>" && nextLine[0] != '<')
+        else if(step == "<inputalphabet>" && nextLine[0] != '<')
         {
-            newDFA.addSymbol(nextLine[0]);
+            newNDFA.addSymbol(nextLine[0]);
+        }
+
+        //add stack alphabet to automata
+        else if(step == "<stackalphabet>" && nextLine[0] != '<')
+        {
+            newNDFA.addStackSymbol(nextLine[0]);
         }
 
         //add transitions to automata
         else if(step == "<transitions>" && nextLine[0] != '<')
         {
-            for(int i = 0; i < 7; i++)
+            for(int i = 0; i < 12; i++)
             {
                 if(i < 2)
                 {
@@ -85,64 +100,151 @@ int main(int argc, char *argv[])
                 {
                     sym = nextLine[i];
                 }
-                else if( i > 4)
+                else if(i == 5)
+                {
+                    stackT = nextLine[i];
+                }
+                else if( i > 6 && i < 9)
                 {
                     state2 += nextLine[i];
                 }
+                else if( i > 9)
+                {
+                    newT += nextLine[i];
+                }
             }
 
-            newDFA.addTransition(state1, sym, state2);
+            /*cout << "state1: " << state1 << 
+            "\n sym: " << sym << 
+            "\n stackT: " << stackT << 
+            "\n state2: " << state2 << 
+            "\n newT: " << newT << endl << endl;*/
+
+            newNDFA.addTransition(state1, sym, stackT, state2, newT);
             state1 = "";
             state2 = "";
+            newT = "";
         }
 
         //sets initial state for automata
-        else if(step == "<initial state>" && nextLine[0] != '<')
+        else if(step == "<initialstate>" && nextLine[0] != '<')
         {
-            newDFA.addInitialState(nextLine);
+            newNDFA.addInitialState(nextLine);
+        }
+
+        else if(step =="<stackstart>" && nextLine[0] != '<')
+        {
+            newNDFA.addStackStart(nextLine[0]);
         }
 
         //sets final states to automata
-        else if(step == "<final states>" && nextLine[0] != '<')
+        else if(step == "<finalstates>" && nextLine[0] != '<')
         {
-            newDFA.addFinalStates(nextLine);
+            newNDFA.addFinalStates(nextLine);
         }
     }
 
     dfaFile.close();
 
-    newDFA.displayDFA();
+    newNDFA.displayNDFA();
 
     //loop for the user to input strings to be read by the automata
-    /*while(true)
+    while(true)
     {
-        newDFA.setCurAsInit();
+
+        string state = "";
+        string stack = "";
+        string curState;
+
+        bool isStack = false;
+
+        newNDFA.setCurAsInit();
         invalid = false;
          
         cout << "Enter a string to process (CTRL^C to end): ";
         getline(cin, uInput);
         cout << endl;
 
-        cout << "[" << newDFA.getCurState() << "]";
+        isStack = false;
+        state = "";
+        stack = "";
 
-        for(int i = 0; i < uInput.size(); i++)
+        curState = newNDFA.getCurState();
+
+        cout << "\n\ncurState: " << curState;
+
+        for(int i = 0; i < curState.length(); i++)
         {
-            if(!newDFA.validCheck(uInput[i]))
+            if(curState[i] == ' ')
+            {
+                isStack = true;
+            }
+
+            if(isStack == false)
+            {
+                state += curState[i];
+            }
+            else
+            {
+                stack += curState[i];
+            }
+        }
+        
+        cout << " (" << state << "," << uInput << "," << stack << ")\n";
+
+        for(int i = 0; i < uInput.length(); i++)
+        {
+            if(!newNDFA.validCheck(uInput[i]))
             {
                 cout << " (Invalid symbol " << uInput[i] << ")";
                 invalid = true;
                 break;
             }
 
-            cout << "-" << uInput[i] <<"->";
+            newNDFA.transition(uInput[i]);
 
-            newDFA.transition(uInput[i]);
+            isStack = false;
+            state = "";
+            stack = "";
+            curState = newNDFA.getCurState();
 
-            cout << "[" << newDFA.getCurState() << "]";
+            for(int i = 0; i < curState.length(); i++)
+            {
+                if(curState[i] == ' ')
+                {
+                    isStack = true;
+                }
+
+                if(isStack == false)
+                {
+                    state += curState[i];
+                }
+                else
+                {
+                    stack += curState[i];
+                }
+            }
+
+            cout << "|- " << "(" << state << ",";
+            
+            for(int n = i + 1; n <= uInput.length();n++)
+            {
+                if(i + 1 < uInput.length())
+                {
+                    cout << uInput[n];
+                }
+                else
+                {
+                    cout << "*";
+                }
+            }
+            
+            cout << "," << stack << ")\n";
 
         }
 
-        if(newDFA.finalCheck() && invalid == false)
+
+        if(newNDFA.finalCheck() && invalid == false)
         {
             cout << " : Accepted\n\n";
         }
@@ -150,7 +252,7 @@ int main(int argc, char *argv[])
         {
             cout << " : Rejected\n\n";
         }
-    }*/
+    }
 
     return 0;
 }
