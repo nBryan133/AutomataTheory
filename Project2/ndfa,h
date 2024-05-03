@@ -39,11 +39,13 @@ public:
     void addFinalStates(string fs);
     void addStackStart(char sym);
 
+    vector<string> possibleNextStates(string state, char sym, char stackT);
+
     void displayNDFA();
 
     void setCurAsInit();
 
-    void transition(char sym);
+    void transition(char sym, char stackT);
 
     string getCurState();
 

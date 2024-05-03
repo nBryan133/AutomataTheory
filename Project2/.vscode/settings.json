@@ -6,6 +6,9 @@
         "map": "cpp",
         "iostream": "cpp",
         "locale": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "iosfwd": "cpp",
+        "vector": "cpp",
+        "tuple": "cpp"
     }
 }
